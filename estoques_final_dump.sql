@@ -24,18 +24,18 @@ DROP TABLE IF EXISTS `entradas`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `entradas` (
   `entrada_id` int(11) NOT NULL AUTO_INCREMENT,
-  `nota_fiscal_id` varchar(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nota_fiscal` varchar(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `produto_id` int(11) NOT NULL,
   `quantidade` int(11) NOT NULL DEFAULT 0,
   `valor_unitario` float NOT NULL DEFAULT 0,
   `data_compra` date NOT NULL DEFAULT curdate(),
   `data_validade` date DEFAULT NULL,
   `data_cadastro` date NOT NULL DEFAULT curdate(),
-  `lote` bigint(20) NOT NULL,
+  `lote` bigint(20) GENERATED ALWAYS AS (unix_timestamp(`data_compra`)) VIRTUAL,
   PRIMARY KEY (`entrada_id`),
   KEY `produto_id_entrada` (`produto_id`),
   CONSTRAINT `produto_id_entrada` FOREIGN KEY (`produto_id`) REFERENCES `produto` (`produto_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -45,9 +45,11 @@ CREATE TABLE `entradas` (
 LOCK TABLES `entradas` WRITE;
 /*!40000 ALTER TABLE `entradas` DISABLE KEYS */;
 INSERT INTO `entradas` VALUES
-(1,'00000001',1,24,2,'2022-06-16',NULL,'2022-06-16',1655348400),
-(2,'00000001',2,30,5,'2022-06-16',NULL,'2022-06-16',1655348400),
-(3,'00000002',2,30,10,'2022-06-19',NULL,'2022-06-19',1655607600);
+(1,'00000001',1,24,2,'2022-06-16',NULL,'2022-06-21',1655337600),
+(2,'00000001',2,30,5,'2022-06-16',NULL,'2022-06-21',1655337600),
+(3,'0000002',2,30,10,'2022-06-21',NULL,'2022-06-21',1655769600),
+(6,'',4,5,10,'2022-06-22',NULL,'2022-06-22',1655856000),
+(7,'magia',2,1,5,'2022-06-22','2022-06-25','2022-06-22',1655856000);
 /*!40000 ALTER TABLE `entradas` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -78,7 +80,7 @@ LOCK TABLES `produto` WRITE;
 INSERT INTO `produto` VALUES
 (1,'Coca cola 500ml','Coca Cola',1,'2022-06-16 12:01:36','2022-06-16 12:01:36'),
 (2,'Doritos 250g','Elma Chips',1,'2022-06-16 12:01:36','2022-06-16 16:23:57'),
-(3,'Gulão','GUlozitos',1,'2022-06-16 16:00:20','2022-06-20 13:47:28'),
+(3,'Gulão','GUlozitos',0,'2022-06-16 16:00:20','2022-06-21 23:35:47'),
 (4,'Açai 1L','Sorveteria Almeida',1,'2022-06-16 16:24:32','2022-06-16 16:26:15');
 /*!40000 ALTER TABLE `produto` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -100,7 +102,7 @@ CREATE TABLE `saidas` (
   PRIMARY KEY (`saida_id`),
   KEY `produto_id_saida` (`produto_id`),
   CONSTRAINT `produto_id_saida` FOREIGN KEY (`produto_id`) REFERENCES `produto` (`produto_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -111,7 +113,8 @@ LOCK TABLES `saidas` WRITE;
 /*!40000 ALTER TABLE `saidas` DISABLE KEYS */;
 INSERT INTO `saidas` VALUES
 (1,1,4,'2022-06-16','2022-06-16',1655348400),
-(2,1,2,'2022-06-19','2022-06-19',1655348400);
+(2,1,2,'2022-06-19','2022-06-19',1655348400),
+(7,2,10,'2022-06-21','2022-06-22',1655780400);
 /*!40000 ALTER TABLE `saidas` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -179,7 +182,7 @@ SET character_set_client = @saved_cs_client;
 /*!50001 SET collation_connection      = utf8mb4_unicode_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `vw_estoque` AS select `p`.`produto_id` AS `produto_id`,sum(ifnull(`e`.`quantidade`,0)) - sum(ifnull(`s`.`quantidade`,0)) AS `quantidade` from ((`produto` `p` left join `entradas` `e` on(`e`.`produto_id` = `p`.`produto_id`)) left join `saidas` `s` on(`s`.`produto_id` = `p`.`produto_id`)) group by `p`.`produto_id` */;
+/*!50001 VIEW `vw_estoque` AS select `p`.`produto_id` AS `produto_id`,(select ifnull(sum(`e2`.`quantidade`),0) from `entradas` `e2` where `e2`.`produto_id` = `p`.`produto_id`) - (select ifnull(sum(`s2`.`quantidade`),0) from `saidas` `s2` where `s2`.`produto_id` = `p`.`produto_id`) AS `quantidade` from ((`produto` `p` left join `entradas` `e` on(`e`.`produto_id` = `p`.`produto_id`)) left join `saidas` `s` on(`s`.`produto_id` = `p`.`produto_id`)) group by `p`.`produto_id` */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
@@ -231,4 +234,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-06-20 14:59:12
+-- Dump completed on 2022-06-22 18:37:27
