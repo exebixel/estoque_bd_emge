@@ -26,6 +26,13 @@
         </a>
       </li>
 
+      <li class="nav-item">
+        <a class="nav-link" href="../saida/index.php">
+          <i class="material-icons">remove</i>
+          <p>Saida Produto</p>
+        </a>
+      </li>
+
     </ul>
   </div>
 </div>
