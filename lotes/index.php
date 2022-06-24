@@ -41,9 +41,6 @@ $dados_lotes = $connect->query($sql);
                                 <div class="card-header card-header-primary">
                                     <h4 class="card-title ">Lotes</h4>
                                     <p class="card-category">Gerencie seus Lotes</p>
-                                    <a href="form.php" style="float: right;">
-                                        <button type="button" class="btn pull-right" style="background-color: #eeeeee; color: #9c27b0">Cadastrar</button>
-                                    </a>
                                 </div>
                                 <div class="card-body">
                                     <div class="table-responsive">
